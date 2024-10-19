@@ -4,6 +4,24 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "name": "admin",
+  "name": "admin1",
   "password": ""
   }
+
+###
+POST http://localhost:3000/pass
+Content-Type: application/json
+
+{
+  "name": "admin",
+  "password": "test",
+  "newPassword": ""
+}
+###
+POST http://localhost:3000/newUser
+Content-Type: application/json
+
+{
+  "name": "user1",
+  "password": "test"
+}

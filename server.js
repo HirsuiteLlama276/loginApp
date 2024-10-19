@@ -26,11 +26,44 @@ server.post('/login',  async (req, res) => {
         return res.status(400).send({error:'Username is required'})
     }
     try{
-        const test = await DbUser.findOne({ name: user.name})
-        res.status(200).send(test)
+        const query = await DbUser.findOne({ name: user.name})
+        res.status(200).send(query)
     }catch (err){
         console.error(err)
         res.status(404).send({error:"User not found"})
+    }
+})
+
+server.post('/pass', async (req,res) =>{
+    const user = {name: req.body.name, password: req.body.password, newPassword: req.body.newPassword}
+    if (!user){
+        return res.status(400).send({error:'Username is required'})
+    }
+    try {
+        const query = await DbUser.updateOne({name: user.name, password: user.password},
+            {password: user.newPassword})
+        if (query.matchedCount === 0)
+        {
+            res.status(404).send({error:"User not found"})
+        }
+        res.status(200).send({message: "Password updated"})
+    }catch(err){
+        console.error(err)
+        res.status(404).send({error:"Internal error"})
+    }
+})
+
+server.post("/newUser", async (req,res)=>{
+    const user = {name: req.body.name, password: req.body.password, role:"user"}
+    if (!user){
+        return res.status(400).send({error:'Username is required'})
+    }
+    try {
+        const query = await DbUser.create(user)
+        res.status(200).send({message: "User added"})
+    }catch (e) {
+        console.log(e)
+        res.status(404).send({error:"Internal error"})
     }
 })
 

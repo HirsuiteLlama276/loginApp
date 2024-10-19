@@ -1,7 +1,9 @@
 var express = require('express');
 const server = express()
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 server.use(express.json())
+server.use(bodyParser.json())
 require('dotenv').config();
 
 mongoose.uri
@@ -15,49 +17,21 @@ const userSchema = new mongoose.Schema(
         role: String,
     },{collection: 'users'}
 );
-const DbUser = mongoose.model('Cyb',userSchema);
+const DbUser = mongoose.model('Cyb', userSchema);
 
-const users  = []
+server.post('/login',  async (req, res) => {
 
-server.get('/users',(req, res) =>{
-  res.json(users)
-})
-
-server.get('/status',(req, res) =>{
-  res.json({status:'Working'})
-})
-
-DbUser.find({ name: 'admin' })
-    .then(user => {
-        console.log(user); // The document returned from the query
-    })
-    .catch(err => {
-        console.error(err); // Handle any errors
-    });
-
-server.post('/login', async (req, res) => {
+    const user = {name: req.body.name, password: req.body.password}
+    if (!user){
+        return res.status(400).send({error:'Username is required'})
+    }
     try{
-        const user = {name: req.body.name, password: req.body.password}
-        //findUser(user.name)
-        const test = await DbUser.findOne({name:user.name})
-        if (!test){
-            return res.status(404).json({message: "User not found"})
-        }
-        res.status(200)
+        const test = await DbUser.findOne({ name: user.name})
+        res.status(200).send(test)
     }catch (err){
         console.error(err)
-        res.status(500)
+        res.status(404).send({error:"User not found"})
     }
-    /*
-    DbUser.findOne({name:user.name}, function (err,users) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(users)
-            res.status(201).send()
-        }
-    })
-*/
 })
 
 server.listen(3000)
